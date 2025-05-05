@@ -1,0 +1,306 @@
+/* 图片预览模态框样式 */
+:root {
+    --bottombar-height: 7vh;
+    --viewer-height: 91vh;
+    --img-space: 1vh;
+    /* 由于网站区分手机端和PC端，动画效果在对应的css文件里定义：
+    --backdrop-blur: 15px;
+    --transition: all .3s ease
+    --animation-zoom-out: zoom-out 0.3s cubic-bezier(0.11, 0.83, 0.39, 1.1) forwards; */
+}
+
+/* 媒体查询：移动设备适配 */
+@media screen and (max-width: 768px) {
+    .img-preview-img {
+        max-height: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+    }
+    
+    /* 以下导航样式已被注释掉，保留以备未来使用 */
+    /*.img-preview-nav {
+        padding: 8px 13px !important;
+        bottom: 100px !important;
+        top: auto !important;
+        font-size: 14px !important; 
+    }
+    
+    .img-preview-nav.prev {
+        left: 40% !important; 
+    }
+    
+    .img-preview-nav.next {
+        right: 40% !important;
+    }*/
+}
+
+/* 基本模态框样式 */
+.img-preview-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(51, 51, 51);
+    overflow: hidden;
+    opacity: 0;
+}
+
+.img-preview-modal.active {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    /* 确保在iOS Safari上正确处理触摸事件 */
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 内容区域样式 */
+.img-preview-content {
+    position: relative;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    touch-action: none;
+    -webkit-touch-callout: none;
+}
+
+/* 滑动容器样式 */
+.img-preview-slides {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y pan-x;
+    will-change: transform; /* 优化性能 */
+}
+
+.img-preview-slides.vertical-dragging {
+    transition: all var(--transition-time) ease;
+    -webkit-transition: all var(--transition-time) ease;
+}
+
+/* 单张幻灯片样式 */
+.img-preview-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: var(--viewer-height);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    touch-action: none;
+}
+
+/* 预览图片样式 */
+.img-preview-img {
+    max-height: 90%;
+    max-width: 90%;
+    object-fit: contain;
+    border-radius: 8px;
+    transition: transform 0s;
+    -webkit-transition: transform 0s;
+    cursor: pointer;
+    transform-origin: center;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    will-change: transform; /* 优化变换性能 */
+}
+
+/* 关闭按钮样式 - 仍然保留但不使用 */
+.img-preview-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+    transition: all var(--transition-time) ease;
+    -webkit-transition: all var(--transition-time) ease;
+}
+
+.img-preview-close:hover {
+    color: var(--Key-color);
+}
+
+/* 缩略图容器样式 */
+.img-preview-thumbnails {
+    z-index: 1001;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(var(--blur-imgtitle));
+    -webkit-backdrop-filter: blur(var(--blur-imgtitle));
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    width: 100%;
+    height: var(--bottombar-height);
+    position: fixed;
+    bottom: 0;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    transition: opacity var(--transition-time) ease;
+    -webkit-transition: opacity var(--transition-time) ease;
+    padding: var(--img-space);
+    display: flex;
+    align-items: center;
+}
+
+.img-preview-thumbnails::-webkit-scrollbar {
+    display: none; /* Safari和Chrome中隐藏滚动条但保持功能 */
+}
+
+.img-preview-thumbnails.grabbing {
+    cursor: grabbing;
+}
+
+/* 缩略图包装容器 */
+.img-preview-thumbnails-wrapper {
+    display: flex;
+    height: 100%;
+    pointer-events: none;
+    gap: 2px;
+    min-width: min-content;
+    padding: 0 5px;
+    width: max-content;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+/* 单个缩略图样式 */
+.img-preview-thumbnail {
+    pointer-events: auto;
+    transition: all var(--transition-time) ease;
+    -webkit-transition: all var(--transition-time) ease;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    border-radius: 4px;
+    object-fit: cover;
+    height: 100%;
+    width: auto;
+    border: 2px solid transparent;
+    flex-shrink: 0;
+    margin: 0;
+    will-change: transform; /* 优化变换性能 */
+}
+
+.img-preview-thumbnail:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.img-preview-thumbnail.active {
+    transform: scale(1.1);
+    z-index: 1;
+    border: 2px solid #fff;
+    margin: 0 10px;
+}
+
+/* 缩放信息样式 */
+.img-zoom-info {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #f1f1f1;
+    font-size: 14px;
+    opacity: 0.7;
+    font-family: PT Mono, monospace;
+}
+
+/* 图片说明样式 */
+.img-preview-caption {
+    position: absolute;
+    top: 21px;
+    text-align: center;
+    color: #f1f1f1;
+    font-size: 16px;
+    font-family: 'AlimamaFangYuanTiVF';
+    font-variation-settings: 'wght' 380, 'ROND' 0;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.5);
+    margin: 0 auto;
+    max-width: 80%;
+    border-radius: 4px;
+    backdrop-filter: blur(var(--backdrop-blur));
+    -webkit-backdrop-filter: blur(var(--backdrop-blur));
+    transition: opacity var(--transition-time) ease;
+    -webkit-transition: opacity var(--transition-time) ease;
+}
+
+.img-preview-caption:hover {
+    opacity: 1;
+}
+
+/* 工具类样式 */
+.img-preview-hidden {
+    opacity: 0;
+    transition: opacity var(--transition-time) ease;
+    -webkit-transition: opacity var(--transition-time) ease;
+}
+
+.img-preview-smooth-scroll {
+    scroll-behavior: smooth;
+}
+
+/* 标题容器样式 */
+.img-preview-caption-container {
+    position: fixed;
+    top: 15px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(var(--blur-imgtitle)) brightness(1.5);
+    -webkit-backdrop-filter: blur(var(--blur-imgtitle)) brightness(1.5);
+    color: #000;
+    padding: 5px 10px;
+    z-index: 1;
+}
+
+/* 图片缩放相关样式 */
+.img-preview-zoom-initial {
+    transform: scale(2);
+    transform-origin: top;
+    z-index: 1;
+    transition: none;
+    -webkit-transition: none;
+    position: relative;
+    opacity: 0;
+}
+
+.img-preview-zoom-reset {
+    transform: none;
+    z-index: auto;
+    transform-origin: center;
+}
+
+.img-preview-zoom-animation {
+    animation: zoom-out var(--animation-time) cubic-bezier(0.11, 0.83, 0.39, 1.1) forwards;;
+    opacity: 1;
+}
+
+@keyframes zoom-out {
+    0% {
+        transform: scale(2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
